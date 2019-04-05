@@ -3,6 +3,10 @@
 # streaming-anonymous-algorithm
 This a dummy platform to implement a streaming anonymous algorithm to protect InputRecord.
 
+## Why
+I felt like I need to do some research into knowledge and techniques with the General Data 
+Protection Regulation (GDPR). I want to find a easy way that could be made more effective, 
+especially when we want to use those data in machine learning and artificial intelligence.  
 
 ## Requirements
 
@@ -13,7 +17,7 @@ This a dummy platform to implement a streaming anonymous algorithm to protect In
      
      ![Class Diagram](./docs/class_diagram.png)
      
-2. K-anonymisation Algorithm (1 hour)
+2. K-anonymisation Algorithm
     
     1.1 sorted and fix-size aggregation algorithm
     * sort records by rawValue.    
