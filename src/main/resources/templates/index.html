@@ -1,0 +1,157 @@
+<HTML>
+
+<HEAD>
+
+<TITLE>Anonymous Algorithm</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="FFFFFF">
+	<div>
+		K:<input type="number" name="kname" id="k" value="5"><br>
+		latency:<input type="number" name="window" id="windows" value="10"><br>
+		Speed of Request:<input type="number" name="tps" id="tps" value=20><br>
+		rawValue min:<input type="number" name="min" id="min" value=1><br>
+		rawValue max:<input type="number" name="max" id="max" value=100>
+		<button onclick="start()">Start</button>
+		<button onclick="stop()">Stop</button>
+		<button onclick="clear1()">clear</button>
+	</div>
+	<br><br>
+	<div style="width: 100%; max-height: 50%;">
+		<div id="left_up" style="width: 50%; float: left;">
+			<p>Input Records</p>
+			<table style="width:30%" id="input_records_table">
+			  <tr> <th>Time</th> <th>rawValue</th> </tr>
+			</table>
+		</div>
+		<div id="right_up" style="width: 50%;float: left;">
+			<p>Output Records</p>
+			<table style="width:100%" id="output_records_table">
+			  <tr> <th >Time</th> <th>outputTime</th><th>rawValue</th> <th>anonymisedValue</th> </tr>
+			</table>
+		</div>
+	</div>
+
+
+
+<script>
+
+var outputRecords = [];
+
+var k = Number(document.getElementById("k").value);
+var windows = Number(document.getElementById("windows").value);
+
+var time = 1;
+var running = true;
+
+function config(){
+	k = Number(document.getElementById("k").value);
+	windows = Number(document.getElementById("windows").value);
+
+	var data = JSON.stringify({"k": k, "window": windows});
+
+	var xhr = new XMLHttpRequest();
+	var url = "http://localhost:8080/config";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(data);
+}
+
+function start() {
+	config();
+  	running = true;
+  	generateInputRecords();
+}
+
+function generateInputRecords(){
+	var min = Number(document.getElementById("min").value);
+	var max = Number(document.getElementById("max").value);
+	var tps = Number(document.getElementById("tps").value);
+	var value = Math.floor(Math.random() * max) + min;
+
+	var table = document.getElementById("input_records_table");
+
+	var row = table.insertRow(time);
+	var cell1 = row.insertCell(0);
+	  var cell2 = row.insertCell(1);
+	  cell1.innerHTML = time;
+	  cell2.innerHTML = value;
+
+	var data = JSON.stringify({"time": time++, "rawValue": value});
+
+  	sendInputRecord(data);
+
+	setTimeout(function(){
+  	if(running){
+	  	generateInputRecords();
+	  	getPublishableRecords();
+  	}
+  },1000/tps);
+}
+
+
+function stop(){
+	running = false;
+}
+
+function clear1(){
+	location.reload();
+}
+
+function sendInputRecord(data){
+	var xhr = new XMLHttpRequest();
+	var url = "http://localhost:8080/processNewRecord";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(data);
+}
+
+function getPublishableRecords(){
+	const url='http://localhost:8080/returnPublishableRecords';
+
+	getJSON(url,function(err, data) {
+	  if (err !== null) {
+	    alert('Something went wrong: ' + err);
+	  } else {
+	  	data.sort((a,b) => (a.inputTime > b.inputTime) ? 1 : ((b.inputTime > a.inputTime) ? -1 : 0)); 
+
+	  	for(d of data){
+	  		pushOutputRecord(d);
+	  	}
+	  }
+	});
+}
+
+function pushOutputRecord(data){
+	outputRecords.push(data);
+	var table = document.getElementById("output_records_table");
+
+	var row = table.insertRow(outputRecords.length);
+	row.insertCell(0).innerHTML = data.inputTime;
+	row.insertCell(1).innerHTML = data.outputTime;
+	row.insertCell(2).innerHTML = data.rawValue;
+	row.insertCell(3).innerHTML = data.anonymisedValue;
+	  
+}
+
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+};
+
+</script>
+
+</BODY>
+
+</HTML>
