@@ -5,12 +5,9 @@ This a dummy platform to implement a streaming anonymous algorithm to protect In
 
 
 ## Requirements
-1. Create an implementation.
-2. Generalising the data introduces distortion. D
-3. Explore the trade-offs between latency and information loss.
 
 ### Step 1
-1. Application Structure (2 hours)
+1. Application Structure
 
      ![Structure](./docs/structure_diagram.png)
      
@@ -39,7 +36,7 @@ This a dummy platform to implement a streaming anonymous algorithm to protect In
 
 
 ### Step 2 
-#### Distortion (20 minutes) 
+#### Distortion
 1. calculate the mean of the InputRecord's rawValue
 2. calculate Mean Variances as A
 3. calculate Anonymised Mean Variances as B
@@ -47,7 +44,7 @@ This a dummy platform to implement a streaming anonymous algorithm to protect In
 
 [Distortion Algorithm Java File](src/main/java/com/zilong/filter/Distortion.java)
 
-### Step 3 (1 hour)
+### Step 3
 #### explore the trade-offs between latency and information loss.  
 
  ![Data](./docs/data.png)
